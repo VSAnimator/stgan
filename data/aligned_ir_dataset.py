@@ -4,9 +4,9 @@ from data.base_dataset import BaseDataset, get_params, get_transform
 import torchvision.transforms as transforms
 from data.image_folder import make_dataset
 from PIL import Image
+import torch
 
-
-class AlignedDataset(BaseDataset):
+class AlignedIrDataset(BaseDataset):
     """A dataset class for paired image dataset.
 
     It assumes that the directory '/path/to/data/train' contains image pairs in the form of {A,B}.
@@ -43,9 +43,10 @@ class AlignedDataset(BaseDataset):
         AB = Image.open(AB_path).convert('RGB')
         # split AB image into A and B
         w, h = AB.size
-        w2 = int(w / 2)
+        w2 = int(w / 3)
         A = AB.crop((0, 0, w2, h))
-        B = AB.crop((w2, 0, w, h))
+        A_ir = AB.crop((w2, 0, 2*w2, h))
+        B = AB.crop((2*w2, 0, w, h))
 
         # apply the same transform to both A and B
         transform_params = get_params(self.opt, A.size)
@@ -53,8 +54,11 @@ class AlignedDataset(BaseDataset):
         B_transform = get_transform(self.opt, transform_params, grayscale=(self.output_nc == 1))
 
         A = A_transform(A)
+        A_ir = A_transform(A_ir)
         B = B_transform(B)
 
+        A_ir = A_ir[0,:,:].unsqueeze(0)
+        A = torch.cat((A,A_ir), 0) # A_ir was stored with three identical channels, this makes A a 4-channel image
         return {'A': A, 'B': B, 'A_paths': AB_path, 'B_paths': AB_path}
 
     def __len__(self):

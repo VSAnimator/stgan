@@ -6,10 +6,10 @@ from data.image_folder import make_dataset
 from PIL import Image
 
 
-class AlignedDataset(BaseDataset):
-    """A dataset class for paired image dataset.
+class TemporalIrDataset(BaseDataset):
+    """A dataset class for temporal image dataset.
 
-    It assumes that the directory '/path/to/data/train' contains image pairs in the form of {A,B}.
+    It assumes that the directory '/path/to/data/train' contains image pairs in the form of {{A_0, A_1, A_2, ir},B}.
     During test time, you need to prepare a directory '/path/to/data/test'.
     """
 
@@ -43,19 +43,30 @@ class AlignedDataset(BaseDataset):
         AB = Image.open(AB_path).convert('RGB')
         # split AB image into A and B
         w, h = AB.size
-        w2 = int(w / 2)
-        A = AB.crop((0, 0, w2, h))
-        B = AB.crop((w2, 0, w, h))
+        w5 = int(w / 5)
+        A_0 = AB.crop((0, 0, w5, h))
+        A_1 = AB.crop((w5, 0, 2*w5, h))
+        A_2 = AB.crop((2*w5, 0, 3*w5, h))
+        ir = AB.crop((3*w5, 0, 4*w5, h))
+        B = AB.crop((4*w5, 0, w, h))
 
         # apply the same transform to both A and B
-        transform_params = get_params(self.opt, A.size)
+        transform_params = get_params(self.opt, A_0.size)
         A_transform = get_transform(self.opt, transform_params, grayscale=(self.input_nc == 1))
         B_transform = get_transform(self.opt, transform_params, grayscale=(self.output_nc == 1))
 
-        A = A_transform(A)
+        A_0 = A_transform(A_0)
+        A_1 = A_transform(A_1)
+        A_2 = A_transform(A_2)
+        ir = A_transform(ir)
         B = B_transform(B)
 
-        return {'A': A, 'B': B, 'A_paths': AB_path, 'B_paths': AB_path}
+        # Now split ir into constituent channels
+        A_0_ir = ir[0,:,:].unsqueeze(0)
+        A_1_ir = ir[1,:,:].unsqueeze(0)
+        A_2_ir = ir[2,:,:].unsqueeze(0)
+
+        return {'A_0': A_0, 'A_1': A_1, 'A_2': A_2,'A_0_ir': A_0_ir, 'A_1_ir': A_1_ir, 'A_2_ir': A_2_ir, 'B': B, 'A_paths': AB_path, 'B_paths': AB_path}
 
     def __len__(self):
         """Return the total number of images in the dataset."""
