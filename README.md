@@ -51,4 +51,4 @@ python train.py --dataroot ./path/to/data/combined  --name stgan --model tempora
 ```bash
 python test.py --dataroot ./path/to/data/combined  --name stgan --model temporal_branched_ir --netG unet_256_independent --input_nc 4
 ```
-- The test results will be saved to a html file here: `./results/stgan/test_latest/index.html`. 2pix/blob/master/docs/tips.md#notes-on-colorization) for more details.
+- The test results will be saved to a html file here: `./results/stgan/test_latest/index.html`. 
