@@ -58,9 +58,9 @@ This will combine each pair of images (cloudy,clear) into a single image file, r
 ### STGAN training
 - Train a model:
 ```bash
-python train.py --dataroot ./path/to/data/combined  --name stgan --model temporal_branched_ir --netG unet_256_independent --input_nc 4
+python train.py --dataroot ./path/to/data/combined  --name stgan --model temporal_branched_ir --netG unet_256_independent --dataset_mode temporal_ir --input_nc 4
 ```
-- Options include temporal_branched and temporal_branched_ir for "model" (depending on if we're using infrared data), 3 or 4 for "input_nc" (again depending on if we're using infrared data), unet_256_independent and independent_resnet_9blocks for "netG", and further options such as "batch_size", "preprocess", and "norm". See train.py for detained training options. 
+- Options include temporal_branched and temporal_branched_ir for "model" (depending on if we're using infrared data), 3 or 4 for "input_nc" (again depending on if we're using infrared data), unet_256_independent and independent_resnet_9blocks for "netG", temporal_ir or temporal for "dataset_mode" (depending on whether we're using infrared data) and further options such as "batch_size", "preprocess", and "norm". See train.py for detained training options. 
 - Our best models often opted for larger batch_size, norm=batch, and both options for netG worked well (with the resnet generator taking longer to train than the unet but sometimes providing improvements in accuracy).
 - To view training results and loss plots, run `python -m visdom.server` and click the URL http://localhost:8097. 
 
