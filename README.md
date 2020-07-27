@@ -66,6 +66,6 @@ python train.py --dataroot ./path/to/data/combined  --name stgan --model tempora
 
 - Test the model:
 ```bash
-python test.py --dataroot ./path/to/data/combined  --name stgan --model temporal_branched_ir --netG unet_256_independent --input_nc 4
+python test.py --dataroot ./path/to/data/combined  --name stgan --model temporal_branched_ir --netG unet_256_independent --dataset_mode temporal_ir --input_nc 4
 ```
 - The test results will be saved to a html file here: `./results/stgan/test_latest/index.html`. 
